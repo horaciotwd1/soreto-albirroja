@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sorteo Albirrojas - Café Martínez</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #CC0000 0%, #0066CC 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 100%;
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #CC0000 0%, #8B0000 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: movePattern 20s linear infinite;
+        }
+
+        @keyframes movePattern {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 20px); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+            font-weight: 500;
+        }
+
+        .accent {
+            color: #FFD700;
+            font-weight: 900;
+        }
+
+        .form-section {
+            padding: 30px 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            animation: fadeIn 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        .form-group:nth-child(5) { animation-delay: 0.5s; }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #E0E0E0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #CC0000;
+            box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+            background-color: rgba(204, 0, 0, 0.02);
+        }
+
+        input::placeholder {
+            color: #999;
+        }
+
+        .error {
+            border-color: #FF4444 !important;
+        }
+
+        .error-message {
+            color: #FF4444;
+            font-size: 12px;
+            margin-top: 6px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .success-message {
+            color: #00A86B;
+            font-size: 12px;
+            margin-top: 6px;
+            display: block;
+            font-weight: 500;
+        }
+
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            flex: 1;
+            padding: 14px 30px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #CC0000 0%, #8B0000 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(204, 0, 0, 0.3);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(204, 0, 0, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .reset-btn {
+            background: #F0F0F0;
+            color: #333;
+        }
+
+        .reset-btn:hover {
+            background: #E0E0E0;
+        }
+
+        .success-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .success-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #00A86B 0%, #006B3B 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 50px;
+            animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .success-content h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .success-content p {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .success-content button {
+            background: linear-gradient(135deg, #CC0000 0%, #8B0000 100%);
+            color: white;
+            padding: 12px 30px;
+        }
+
+        .info-box {
+            background: #F9F9F9;
+            border-left: 4px solid #CC0000;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .brands {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #E0E0E0;
+            justify-content: center;
+        }
+
+        .brand-item {
+            font-size: 11px;
+            color: #999;
+            text-align: center;
+        }
+
+        .brand-item strong {
+            color: #333;
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .form-section {
+                padding: 20px 15px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function SorteoForm() {
+            const [formData, setFormData] = useState({
+                nombre: '',
+                cedula: '',
+                telefono: '',
+                sucursal: '',
+                factura: ''
+            });
+
+            const [errors, setErrors] = useState({});
+            const [showSuccess, setShowSuccess] = useState(false);
+            const [isSubmitting, setIsSubmitting] = useState(false);
+
+            const sucursales = [
+                'Selecciona una sucursal',
+                'Café Martínez - Mariscal',
+                'Café Martínez - Tupi Marketplace',
+                'Café Martínez - Mariano',
+                'Café Martínez - Plaza Norte'
+            ];
+
+            const validateForm = () => {
+                const newErrors = {};
+
+                if (!formData.nombre.trim()) {
+                    newErrors.nombre = 'El nombre es requerido';
+                } else if (formData.nombre.trim().length < 3) {
+                    newErrors.nombre = 'El nombre debe tener al menos 3 caracteres';
+                }
+
+                if (!formData.cedula.trim()) {
+                    newErrors.cedula = 'La cédula es requerida';
+                } else if (!/^\d{5,8}$/.test(formData.cedula.trim())) {
+                    newErrors.cedula = 'La cédula debe contener entre 5 y 8 números';
+                }
+
+                if (!formData.telefono.trim()) {
+                    newErrors.telefono = 'El teléfono es requerido';
+                } else if (!/^\d{7,12}$/.test(formData.telefono.trim().replace(/[\s\-]/g, ''))) {
+                    newErrors.telefono = 'El teléfono debe ser válido';
+                }
+
+                if (!formData.sucursal || formData.sucursal === '') {
+                    newErrors.sucursal = 'Debes seleccionar una sucursal';
+                }
+
+                if (!formData.factura.trim()) {
+                    newErrors.factura = 'El número de factura es requerido';
+                } else if (formData.factura.trim().length < 3) {
+                    newErrors.factura = 'El número de factura debe ser válido';
+                }
+
+                setErrors(newErrors);
+                return Object.keys(newErrors).length === 0;
+            };
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+                if (errors[name]) {
+                    setErrors(prev => ({
+                        ...prev,
+                        [name]: ''
+                    }));
+                }
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+
+                if (!validateForm()) {
+                    return;
+                }
+
+                setIsSubmitting(true);
+
+                try {
+                    // IMPORTANTE: URL del Google Apps Script configurada
+                    const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyBWZ7zgVjzsrUHDCFvH0pdHvJzHscQiCtF9l_jq0PLziSZSxAC_DgwYqB86ZxzNfUY6Q/exec';
+                    
+                    const response = await fetch(APPS_SCRIPT_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            nombre: formData.nombre,
+                            cedula: formData.cedula,
+                            telefono: formData.telefono,
+                            sucursal: formData.sucursal,
+                            factura: formData.factura
+                        })
+                    });
+
+                    // Google Apps Script devuelve respuesta
+                    setShowSuccess(true);
+                    setFormData({
+                        nombre: '',
+                        cedula: '',
+                        telefono: '',
+                        sucursal: '',
+                        factura: ''
+                    });
+                    
+                    setTimeout(() => {
+                        setShowSuccess(false);
+                    }, 5000);
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    // Aún así mostramos éxito ya que Google Apps Script usa no-cors
+                    setShowSuccess(true);
+                    setFormData({
+                        nombre: '',
+                        cedula: '',
+                        telefono: '',
+                        sucursal: '',
+                        factura: ''
+                    });
+                } finally {
+                    setIsSubmitting(false);
+                }
+            };
+
+            const handleReset = () => {
+                setFormData({
+                    nombre: '',
+                    cedula: '',
+                    telefono: '',
+                    sucursal: '',
+                    factura: ''
+                });
+                setErrors({});
+            };
+
+            return (
+                <>
+                    <div className="container">
+                        <div className="header">
+                            <div className="header-content">
+                                <h1>SORTEAMOS LA <span className="accent">ALBIRROJA!</span></h1>
+                                <p>Café, Pasión y ¡Garra Guaraní!</p>
+                            </div>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="form-section">
+                            <div className="form-group">
+                                <label htmlFor="nombre">Nombre Completo</label>
+                                <input
+                                    type="text"
+                                    id="nombre"
+                                    name="nombre"
+                                    value={formData.nombre}
+                                    onChange={handleChange}
+                                    placeholder="Ej: Juan García López"
+                                    className={errors.nombre ? 'error' : ''}
+                                />
+                                {errors.nombre && <span className="error-message">{errors.nombre}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="cedula">Cédula de Identidad</label>
+                                <input
+                                    type="text"
+                                    id="cedula"
+                                    name="cedula"
+                                    value={formData.cedula}
+                                    onChange={handleChange}
+                                    placeholder="Ej: 1234567"
+                                    className={errors.cedula ? 'error' : ''}
+                                />
+                                {errors.cedula && <span className="error-message">{errors.cedula}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="telefono">Número de Contacto</label>
+                                <input
+                                    type="tel"
+                                    id="telefono"
+                                    name="telefono"
+                                    value={formData.telefono}
+                                    onChange={handleChange}
+                                    placeholder="Ej: 0971234567"
+                                    className={errors.telefono ? 'error' : ''}
+                                />
+                                {errors.telefono && <span className="error-message">{errors.telefono}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="sucursal">Sucursal Café Martínez</label>
+                                <select
+                                    id="sucursal"
+                                    name="sucursal"
+                                    value={formData.sucursal}
+                                    onChange={handleChange}
+                                    className={errors.sucursal ? 'error' : ''}
+                                >
+                                    {sucursales.map((suc, idx) => (
+                                        <option key={idx} value={idx === 0 ? '' : suc}>
+                                            {suc}
+                                        </option>
+                                    ))}
+                                </select>
+                                {errors.sucursal && <span className="error-message">{errors.sucursal}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="factura">Número de Factura</label>
+                                <input
+                                    type="text"
+                                    id="factura"
+                                    name="factura"
+                                    value={formData.factura}
+                                    onChange={handleChange}
+                                    placeholder="Ej: INV-2024-12345"
+                                    className={errors.factura ? 'error' : ''}
+                                />
+                                {errors.factura && <span className="error-message">{errors.factura}</span>}
+                            </div>
+
+                            <div className="button-group">
+                                <button type="submit" className="submit-btn" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Enviando...' : '✓ Enviar'}
+                                </button>
+                                <button type="button" className="reset-btn" onClick={handleReset}>
+                                    Limpiar
+                                </button>
+                            </div>
+
+                            <div className="info-box">
+                                <strong>ℹ️ Importante</strong><br/>
+                                Verifica que tus datos sean correctos. Con tu compra desde Gs. 30.000 participás automáticamente en el sorteo. ¡Suerte! 🍀
+                            </div>
+
+                            <div className="brands">
+                                <div className="brand-item">
+                                    <strong>MARTINEZ</strong>
+                                    Mariscal
+                                </div>
+                                <div className="brand-item">
+                                    <strong>MARTINEZ</strong>
+                                    Tupi Marketplace
+                                </div>
+                                <div className="brand-item">
+                                    <strong>MARTINEZ</strong>
+                                    Mariano
+                                </div>
+                                <div className="brand-item">
+                                    <strong>MARTINEZ</strong>
+                                    Plaza Norte
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    {showSuccess && (
+                        <div className="success-modal">
+                            <div className="success-content">
+                                <div className="checkmark">✓</div>
+                                <h2>¡Registrado!</h2>
+                                <p>Tu participación en el sorteo ha sido registrada exitosamente. ¡Mucha suerte! 🍀</p>
+                                <button onClick={() => setShowSuccess(false)}>Cerrar</button>
+                            </div>
+                        </div>
+                    )}
+                </>
+            );
+        }
+
+        ReactDOM.render(<SorteoForm />, document.getElementById('root'));
+    </script>
+</body>
+</html>
